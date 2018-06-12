@@ -1,0 +1,35 @@
+plugins {
+    id 'java-gradle-plugin'
+    id 'maven'
+}
+
+group = 'com.microsoft.azure'
+version = '1.0-SNAPSHOT'
+sourceCompatibility = 1.8
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+dependencies {
+    compile 'com.microsoft.azure:azure:1.10.0'
+    compile 'commons-net:commons-net:3.6'
+    compile 'commons-io:commons-io:2.2'
+    testCompile 'junit:junit:4.12'
+}
+
+uploadArchives {
+    repositories {
+        mavenLocal()
+    }
+}
+
+gradlePlugin {
+    plugins {
+        azureWebappPlugin {
+            id = 'com.microsoft.azure.azurewebapp'
+            implementationClass = 'com.microsoft.azure.gradle.webapp.AzureWebappPlugin'
+        }
+    }
+}
