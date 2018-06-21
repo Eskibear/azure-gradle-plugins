@@ -6,6 +6,8 @@
 
 package com.microsoft.azure.gradle.webapp.auth;
 
+import com.microsoft.azure.gradle.webapp.configuration.Authentication;
+
 import java.io.File;
 
 public interface AuthConfiguration {
@@ -14,9 +16,5 @@ public interface AuthConfiguration {
 
     String getUserAgent();
 
-    boolean hasAuthenticationSettings();
-
-    String getAuthenticationSetting(String key);
-
-    File getAuthFile();
+    Authentication getAuthenticationSettings();
 }

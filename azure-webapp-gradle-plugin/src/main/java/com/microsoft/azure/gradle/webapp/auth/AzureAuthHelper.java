@@ -9,6 +9,7 @@ package com.microsoft.azure.gradle.webapp.auth;
 import com.microsoft.azure.AzureEnvironment;
 import com.microsoft.azure.credentials.ApplicationTokenCredentials;
 import com.microsoft.azure.credentials.AzureCliCredentials;
+import com.microsoft.azure.gradle.webapp.configuration.Authentication;
 import com.microsoft.azure.management.Azure;
 import com.microsoft.azure.management.Azure.Authenticated;
 import com.microsoft.rest.LogLevel;
@@ -111,16 +112,23 @@ public class AzureAuthHelper {
     protected Authenticated getAuthObj() {
         Authenticated auth;
         // check if project has Azure authentication settings in build.gradle or gradle.properties or in environment variables
-        boolean hasAuthSetting = config.hasAuthenticationSettings();
-        if (hasAuthSetting) {
-            auth = getAuthObjFromConfiguration(config);
-            if (auth == null) {
-                auth = getAuthObjFromFile(config.getAuthFile());
-            }
-        } else {
-            auth = getAuthObjFromAzureCli();
+        final Authentication authSetting = config.getAuthenticationSettings();
+        switch ( authSetting.getType() ) {
+            case FILE:
+                if (authSetting.getFile() != null) {
+                    return getAuthObjFromFile(new File(authSetting.getFile()));
+                } else {
+                    logger.quiet("Failed to get authentication file, please make sure it is specified.");
+                    return null;
+                }
+            case PROPERTIES:
+                return getAuthObjFromConfiguration(authSetting);
+            case AZURECLI:
+                return getAuthObjFromAzureCli();
+            default:
+                logger.error("Unrecognized authentication type.");
+                return null;
         }
-        return auth;
     }
 
     /**
@@ -128,15 +136,16 @@ public class AzureAuthHelper {
      *
      * @return Authenticated object if configurations are correct; otherwise return null.
      */
-    private Authenticated getAuthObjFromConfiguration(final AuthConfiguration config) {
-        final ApplicationTokenCredentials credential = getAppTokenCredentials();
+    private Authenticated getAuthObjFromConfiguration(final Authentication authSetting) {
+        final ApplicationTokenCredentials credential = getAppTokenCredentials(authSetting);
         if (credential == null) {
+            logger.quiet("Authentication info for Azure is not valid.");
             return null;
         }
 
         final Authenticated auth = azureConfigure().authenticate(credential);
         if (auth != null) {
-            logger.quiet(AUTH_WITH_CLIENT_ID + config.getAuthenticationSetting(CLIENT_ID));
+            logger.quiet(AUTH_WITH_CLIENT_ID + authSetting.getClient());
         }
         return auth;
     }
@@ -193,24 +202,24 @@ public class AzureAuthHelper {
      *
      * @return ApplicationTokenCredentials object if configuration is correct; otherwise return null.
      */
-    private ApplicationTokenCredentials getAppTokenCredentials() {
-        final String clientId = config.getAuthenticationSetting(CLIENT_ID);
+    private ApplicationTokenCredentials getAppTokenCredentials(Authentication authSetting) {
+        final String clientId = authSetting.getClient();
         if (StringUtils.isEmpty(clientId)) {
             logger.quiet(CLIENT_ID_NOT_CONFIG);
             return null;
         }
 
-        final String tenantId = config.getAuthenticationSetting(TENANT_ID);
+        final String tenantId = authSetting.getTenant();
         if (StringUtils.isEmpty(tenantId)) {
             logger.quiet(TENANT_ID_NOT_CONFIG);
             return null;
         }
 
-        final String environment = config.getAuthenticationSetting(ENVIRONMENT);
+        final String environment = authSetting.getEnvironment();
         final AzureEnvironment azureEnvironment = getAzureEnvironment(environment);
         logger.quiet("Azure Management Endpoint: " + azureEnvironment.managementEndpoint());
 
-        final String key = config.getAuthenticationSetting(KEY);
+        final String key = authSetting.getKey();
         if (!StringUtils.isEmpty(key)) {
             logger.quiet(USE_KEY_TO_AUTH);
             return new ApplicationTokenCredentials(clientId, tenantId, key, azureEnvironment);
@@ -218,13 +227,13 @@ public class AzureAuthHelper {
             logger.quiet(KEY_NOT_CONFIG);
         }
 
-        final String certificate = config.getAuthenticationSetting(CERTIFICATE);
+        final String certificate = authSetting.getCertificate();
         if (StringUtils.isEmpty(certificate)) {
             logger.quiet(CERTIFICATE_FILE_NOT_CONFIG);
             return null;
         }
 
-        final String certificatePassword = config.getAuthenticationSetting(CERTIFICATE_PASSWORD);
+        final String certificatePassword = authSetting.getCertificatePassword();
         try {
             byte[] cert;
             cert = Files.readAllBytes(Paths.get(certificate, new String[0]));

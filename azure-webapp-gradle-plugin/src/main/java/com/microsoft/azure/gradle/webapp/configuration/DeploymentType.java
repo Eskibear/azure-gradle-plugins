@@ -14,21 +14,6 @@ import java.util.Locale;
 public enum DeploymentType {
     NONE,
     FTP,
-    WEBDEPLOY,
-    WARDEPLOY,
+    WAR,
     UNKNOWN;
-
-//    public static DeploymentType fromString(final String input) {
-//        if (StringUtils.isEmpty(input)) {
-//            return NONE;
-//        }
-//
-//        switch (input.toUpperCase(Locale.ENGLISH)) {
-//            case "FTP":
-//                return FTP;
-//            case
-//            default:
-//                return UNKNOWN;
-//        }
-//    }
 }

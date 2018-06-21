@@ -5,10 +5,7 @@
  */
 package com.microsoft.azure.gradle.webapp;
 
-import com.microsoft.azure.gradle.webapp.configuration.AppServiceOnLinux;
-import com.microsoft.azure.gradle.webapp.configuration.AppServiceOnWindows;
-import com.microsoft.azure.gradle.webapp.configuration.ContainerSettings;
-import com.microsoft.azure.gradle.webapp.configuration.DeploymentType;
+import com.microsoft.azure.gradle.webapp.configuration.*;
 import com.microsoft.azure.gradle.webapp.model.PricingTierEnum;
 import com.microsoft.azure.management.appservice.PricingTier;
 import groovy.lang.Closure;
@@ -20,6 +17,8 @@ import java.io.File;
 public class AzureWebAppExtension {
     public static final String WEBAPP_EXTENSION_NAME = "azurewebapp";
     private final Project project;
+    @Input
+    private String subscriptionId = "";
     @Input
     private String appName;
     @Input
@@ -37,15 +36,15 @@ public class AzureWebAppExtension {
     @Input
     private boolean stopAppDuringDeployment;
     @Input
-    private File authFile;
-    @Input
-    private DeploymentType deploymentType = DeploymentType.WARDEPLOY;
+    private DeploymentType deploymentType = DeploymentType.WAR;
 
     private AppServiceOnLinux appServiceOnLinux;
 
     private AppServiceOnWindows appServiceOnWindows;
 
     private ContainerSettings containerSettings;
+
+    private Authentication authentication;
 
     public AzureWebAppExtension(Project project) {
         this.project = project;
@@ -102,10 +101,6 @@ public class AzureWebAppExtension {
         return stopAppDuringDeployment;
     }
 
-    public File getAuthFile() {
-        return authFile;
-    }
-
     public DeploymentType getDeploymentType() {
         return deploymentType;
     }
@@ -116,5 +111,18 @@ public class AzureWebAppExtension {
 
     public String getAppServicePlanName() {
         return appServicePlanName;
+    }
+
+    public String getSubscriptionId() {
+        return subscriptionId;
+    }
+
+    public Authentication getAuthentication() {
+        return authentication;
+    }
+
+    public void setAuthentication(Closure closure) {
+        authentication = new Authentication();
+        project.configure(authentication, closure);
     }
 }

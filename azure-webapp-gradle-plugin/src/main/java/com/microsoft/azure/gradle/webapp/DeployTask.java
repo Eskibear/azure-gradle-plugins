@@ -8,6 +8,7 @@ package com.microsoft.azure.gradle.webapp;
 import com.microsoft.azure.gradle.webapp.auth.AuthConfiguration;
 import com.microsoft.azure.gradle.webapp.auth.AzureAuthFailureException;
 import com.microsoft.azure.gradle.webapp.auth.AzureAuthHelper;
+import com.microsoft.azure.gradle.webapp.configuration.Authentication;
 import com.microsoft.azure.gradle.webapp.handlers.HandlerFactory;
 import com.microsoft.azure.gradle.webapp.handlers.RuntimeHandler;
 import com.microsoft.azure.management.Azure;
@@ -17,6 +18,8 @@ import org.gradle.api.tasks.TaskAction;
 import org.gradle.api.tasks.TaskExecutionException;
 
 import java.io.File;
+import java.lang.reflect.Field;
+import java.util.Map;
 
 public class DeployTask extends DefaultTask implements AuthConfiguration {
     public static final String TASK_NAME = "azureWebappDeploy";
@@ -33,6 +36,8 @@ public class DeployTask extends DefaultTask implements AuthConfiguration {
     private static final String START_APP = "Starting Web App after deploying artifacts...";
     private static final String STOP_APP_DONE = "Successfully stopped Web App.";
     private static final String START_APP_DONE = "Successfully started Web App.";
+
+    private static final String SUBSCRIPTION_ID_KEY = "com.microsoft.azure.subscriptionId";
 
     private Azure azure;
     private AzureWebAppExtension azureWebAppExtension;
@@ -143,7 +148,7 @@ public class DeployTask extends DefaultTask implements AuthConfiguration {
 
     @Override
     public String getSubscriptionId() {
-        return (String) getProject().getProperties().get("subscriptionId");
+        return (String) getProject().getProperties().get(SUBSCRIPTION_ID_KEY);
     }
 
     // todo
@@ -157,22 +162,20 @@ public class DeployTask extends DefaultTask implements AuthConfiguration {
     }
 
     @Override
-    public boolean hasAuthenticationSettings() {
-        return getProject().getProperties().containsKey(AzureAuthHelper.CLIENT_ID) || azureWebAppExtension.getAuthFile() != null
-                || System.getenv(AzureAuthHelper.CLIENT_ID) != null;
-    }
-
-    @Override
-    public String getAuthenticationSetting(String key) {
-        if (getProject().getProperties().get(key) != null) {
-            return (String) getProject().getProperties().get(key);
+    public Authentication getAuthenticationSettings() {
+        Authentication authSetting = azureWebAppExtension.getAuthentication();
+        Map<String, ?> props = getProject().getProperties();
+        for ( Field f : authSetting.getClass().getDeclaredFields()){
+            try{
+                String key = String.format("com.microsoft.azure.auth.%s", f.getName());
+                if (null == f.get(authSetting) && props.containsKey(key)) {
+                    f.set(authSetting, props.get(key));
+                }
+            } catch (IllegalAccessException e) {
+                // ignore
+            }
         }
-        return System.getenv(key);
-    }
-
-    @Override
-    public File getAuthFile() {
-        return azureWebAppExtension.getAuthFile();
+        return authSetting;
     }
 
     class DeploymentUtil {

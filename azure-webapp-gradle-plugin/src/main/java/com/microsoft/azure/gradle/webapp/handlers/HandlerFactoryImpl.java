@@ -70,7 +70,7 @@ public class HandlerFactoryImpl extends HandlerFactory {
 
     @Override
     public ArtifactHandler getArtifactHandler(final DeployTask task) throws GradleException {
-        if (DeploymentType.WARDEPLOY.equals(task.getAzureWebAppExtension().getDeploymentType())) {
+        if (DeploymentType.WAR.equals(task.getAzureWebAppExtension().getDeploymentType())) {
             return new WarDeployHandlerImpl(task);
         }
 //        if (task.getAzureWebAppExtension().getPackageUri() != null) {

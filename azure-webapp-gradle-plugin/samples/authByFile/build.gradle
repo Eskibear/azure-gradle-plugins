@@ -1,0 +1,31 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        mavenLocal()
+    }
+    dependencies {
+        classpath group: 'com.microsoft.azure',
+                name: 'azure-webapp-gradle-plugin',
+                version: '1.0-SNAPSHOT'
+    }
+}
+
+apply plugin: 'com.microsoft.azure.azurewebapp'
+
+azurewebapp {
+    deploymentType = 'war'
+    resourceGroup = 'resourceGroup'
+    appName = 'appname'
+    pricingTier = 'S1'
+    region = 'southcentralus'
+    target = "${projectDir}/../webProject.war"
+    appServiceOnWindows = {
+        javaWebContainer = "tomcat 8.5"
+        javaVersion = "1.8.0_102"
+        urlPath = 'authbyfile'
+    }
+    authentication = {
+        type = "file"
+        file = "<path of auth file>"
+    }
+}
