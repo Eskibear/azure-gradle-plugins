@@ -7,8 +7,6 @@
 package com.microsoft.azure.gradle.webapp.configuration;
 
 import org.apache.commons.lang3.StringUtils;
-import org.gradle.api.tasks.Input;
-import org.gradle.api.tasks.Optional;
 
 /**
  * Docker container setting class.
@@ -17,36 +15,25 @@ public class ContainerSettings {
     /**
      * Docker image name
      */
-    @Input
     private String imageName;
 
     /**
      * Start up file.
      */
-    @Input
-    @Optional
     private String startUpFile;
 
     /**
      * Server Id.
      */
-    @Input
-    @Optional
     private String serverId;
 
-    @Input
-    @Optional
     private String username;
 
-    @Input
-    @Optional
     private String password;
 
     /**
      * Private registry URL.
      */
-    @Input
-    @Optional
     private String registryUrl;
 
     public String getImageName() {

@@ -17,33 +17,19 @@ import java.io.File;
 public class AzureWebAppExtension {
     public static final String WEBAPP_EXTENSION_NAME = "azurewebapp";
     private final Project project;
-    @Input
     private String subscriptionId = "";
-    @Input
     private String appName;
-    @Input
     private String resourceGroup;
-    @Input
     private String region = "westus2";
-    @Input
     private String appServicePlanResourceGroup;
-    @Input
     private String appServicePlanName;
-    @Input
     private PricingTierEnum pricingTier;
-    @Input
     private String target;
-    @Input
     private boolean stopAppDuringDeployment;
-    @Input
     private DeploymentType deploymentType = DeploymentType.WAR;
-
     private AppServiceOnLinux appServiceOnLinux;
-
     private AppServiceOnWindows appServiceOnWindows;
-
     private ContainerSettings containerSettings;
-
     private Authentication authentication;
 
     public AzureWebAppExtension(Project project) {

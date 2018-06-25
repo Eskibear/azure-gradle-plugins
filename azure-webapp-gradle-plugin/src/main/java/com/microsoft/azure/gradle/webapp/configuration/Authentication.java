@@ -1,32 +1,14 @@
 package com.microsoft.azure.gradle.webapp.configuration;
 
-import org.gradle.api.tasks.Input;
-import org.gradle.api.tasks.Optional;
-
 public class Authentication {
-    @Input
     private AuthenticationType type;
-    @Input
-    @Optional
-    public String file;
-    @Input
-    @Optional
-    public String client;
-    @Input
-    @Optional
-    public String tenant;
-    @Input
-    @Optional
-    public String key;
-    @Input
-    @Optional
-    public String certificate;
-    @Input
-    @Optional
-    public String certificatePassword;
-    @Input
-    @Optional
-    public String environment = "AZURE";
+    private String file;
+    private String client;
+    private String tenant;
+    private String key;
+    private String certificate;
+    private String certificatePassword;
+    private String environment = "AZURE";
 
 
     public String getFile() {

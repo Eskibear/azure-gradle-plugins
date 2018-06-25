@@ -3,6 +3,7 @@
 *.ipr
 *.iws
 .idea_modules/
+out/
 
 .gradle
 build/
