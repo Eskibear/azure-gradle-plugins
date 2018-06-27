@@ -3,6 +3,7 @@
  * Licensed under the MIT License. See License.txt in the project root for
  * license information.
  */
+
 package com.microsoft.azure.gradle.webapp.handlers;
 
 import com.google.common.io.Files;
@@ -16,7 +17,8 @@ public class WarDeployHandlerImpl implements ArtifactHandler {
     private static final String FILE_IS_NOT_WAR = "The deployment file is not a war typed file.";
     private static final String FIND_WAR_FILE_FAIL = "Failed to find the war file: '%s'";
     private static final int DEFAULT_MAX_RETRY_TIMES = 3;
-    private static final String UPLOAD_FAILURE = "Failed to deploy the war file to server, retrying immediately (%d/%d)";
+    private static final String UPLOAD_FAILURE =
+            "Failed to deploy the war file to server, retrying immediately (%d/%d)";
 
     private DeployTask task;
 
@@ -35,8 +37,8 @@ public class WarDeployHandlerImpl implements ArtifactHandler {
         File targetFile = new File(warFile);
         assureWarFileExisted(targetFile);
 
-        if (task.getAzureWebAppExtension().getAppServiceOnLinux() == null &&
-                task.getAzureWebAppExtension().getAppServiceOnWindows() == null) {
+        if (task.getAzureWebAppExtension().getAppServiceOnLinux() == null
+                && task.getAzureWebAppExtension().getAppServiceOnWindows() == null) {
             throw new GradleException("WAR deployment type not available for Web Apps on Containers deployments");
         }
         String contextPath = task.getAzureWebAppExtension().getDeployment().getContextPath();

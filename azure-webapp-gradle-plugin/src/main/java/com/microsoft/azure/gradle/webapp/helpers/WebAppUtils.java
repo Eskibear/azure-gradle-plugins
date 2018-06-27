@@ -15,24 +15,21 @@ import com.microsoft.azure.management.appservice.AppServicePlan;
 import com.microsoft.azure.management.appservice.OperatingSystem;
 import com.microsoft.azure.management.appservice.RuntimeStack;
 import com.microsoft.azure.management.appservice.WebApp;
-import com.microsoft.azure.management.appservice.WebApp.DefinitionStages.WithNewAppServicePlan;
-import com.microsoft.azure.management.resources.fluentcore.arm.models.GroupableResource.DefinitionStages.WithGroup;
 import com.microsoft.azure.management.resources.fluentcore.utils.SdkContext;
 import org.apache.commons.lang3.StringUtils;
 import org.gradle.api.GradleException;
 import org.gradle.api.logging.Logging;
 import org.gradle.api.tasks.TaskExecutionException;
 
-import java.util.UUID;
-
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 public class WebAppUtils {
-    private static final String CONTAINER_SETTING_NOT_APPLICABLE =
-            "Trying to deploy to existing Web App on Windows; 'containerSettings' or 'appServiceOnLinux' not applicaple. " +
-                    "Please use 'appServiceOnWindows' to configure your runtime.";
-    private static final String JAVA_VERSION_NOT_APPLICABLE = "Trying to deploy to existing Web App on Linux; 'appServiceOnWindows' is not applicable to Web App on Linux. " +
-            "please use 'containerSettings' or appServiceOnWindows' to specify your runtime.";
+    private static final String CONTAINER_SETTING_NOT_APPLICABLE = "Trying to deploy to existing Web App on Windows; "
+            + "'containerSettings' or 'appServiceOnLinux' not applicaple. "
+            + "Please use 'appServiceOnWindows' to configure your runtime.";
+    private static final String JAVA_VERSION_NOT_APPLICABLE = "Trying to deploy to existing Web App on Linux; "
+            + "'appServiceOnWindows' is not applicable to Web App on Linux. "
+            + "please use 'containerSettings' or appServiceOnWindows' to specify your runtime.";
     private static final String NOT_SUPPORTED_IMAGE = "The image: '%s' is not supported.";
     private static final String IMAGE_NOT_GIVEN = "Image name is not specified.";
     private static final String SERVICE_PLAN_NOT_APPLICABLE = "The App Service Plan '%s' is not a %s Plan";
@@ -57,17 +54,21 @@ public class WebAppUtils {
         }
     }
 
-    public static WebApp.DefinitionStages.WithDockerContainerImage defineLinuxApp(DeployTask task, final AppServicePlan plan)
-            throws Exception {
+    public static WebApp.DefinitionStages.WithDockerContainerImage defineLinuxApp(
+            DeployTask task,
+            final AppServicePlan plan
+    ) throws Exception {
         assureLinuxPlan(plan);
 
         final String resourceGroup = task.getAzureWebAppExtension().getResourceGroup();
-        final WebApp.DefinitionStages.ExistingLinuxPlanWithGroup existingLinuxPlanWithGroup = task.getAzureClient().webApps()
+        final WebApp.DefinitionStages.ExistingLinuxPlanWithGroup existingLinuxPlanWithGroup = task
+                .getAzureClient()
+                .webApps()
                 .define(task.getAzureWebAppExtension().getAppName())
                 .withExistingLinuxPlan(plan);
-        return task.getAzureClient().resourceGroups().contain(resourceGroup) ?
-                existingLinuxPlanWithGroup.withExistingResourceGroup(resourceGroup) :
-                existingLinuxPlanWithGroup.withNewResourceGroup(resourceGroup);
+        return task.getAzureClient().resourceGroups().contain(resourceGroup)
+                ? existingLinuxPlanWithGroup.withExistingResourceGroup(resourceGroup)
+                : existingLinuxPlanWithGroup.withNewResourceGroup(resourceGroup);
     }
 
     private static void assureLinuxPlan(final AppServicePlan plan) throws GradleException {
@@ -82,12 +83,14 @@ public class WebAppUtils {
         assureWindowsPlan(plan);
 
         final String resourceGroup = task.getAzureWebAppExtension().getResourceGroup();
-        final WebApp.DefinitionStages.ExistingWindowsPlanWithGroup existingWindowsPlanWithGroup =  task.getAzureClient().webApps()
+        final WebApp.DefinitionStages.ExistingWindowsPlanWithGroup existingWindowsPlanWithGroup = task
+                .getAzureClient()
+                .webApps()
                 .define(task.getAzureWebAppExtension().getAppName())
                 .withExistingWindowsPlan(plan);
-        return task.getAzureClient().resourceGroups().contain(resourceGroup) ?
-                existingWindowsPlanWithGroup.withExistingResourceGroup(resourceGroup) :
-                existingWindowsPlanWithGroup.withNewResourceGroup(resourceGroup);
+        return task.getAzureClient().resourceGroups().contain(resourceGroup)
+                ? existingWindowsPlanWithGroup.withExistingResourceGroup(resourceGroup)
+                : existingWindowsPlanWithGroup.withNewResourceGroup(resourceGroup);
     }
 
     private static void assureWindowsPlan(final AppServicePlan plan) throws GradleException {
@@ -97,12 +100,20 @@ public class WebAppUtils {
         }
     }
 
+    /**
+     * createOrGetAppServicePlan.
+     *
+     * @param task TODO.
+     * @param os   TODO.
+     * @return TODO.
+     * @throws Exception TODO.
+     */
     public static AppServicePlan createOrGetAppServicePlan(DeployTask task, OperatingSystem os)
             throws Exception {
         AzureWebAppExtension extension = task.getAzureWebAppExtension();
         AppServicePlan plan = null;
-        final String servicePlanResGrp = StringUtils.isNotEmpty(extension.getAppServicePlanResourceGroup()) ?
-                extension.getAppServicePlanResourceGroup() : extension.getResourceGroup();
+        final String servicePlanResGrp = StringUtils.isNotEmpty(extension.getAppServicePlanResourceGroup())
+                ? extension.getAppServicePlanResourceGroup() : extension.getResourceGroup();
 
         String servicePlanName = extension.getAppServicePlanName();
         if (StringUtils.isNotEmpty(servicePlanName)) {
@@ -120,10 +131,11 @@ public class WebAppUtils {
                     .define(servicePlanName)
                     .withRegion(extension.getRegion());
 
-            final AppServicePlan.DefinitionStages.WithPricingTier withPricingTier
-                    = azure.resourceGroups().contain(servicePlanResGrp) ?
-                    withGroup.withExistingResourceGroup(servicePlanResGrp) :
-                    withGroup.withNewResourceGroup(servicePlanResGrp);
+            final AppServicePlan.DefinitionStages.WithPricingTier withPricingTier = azure
+                    .resourceGroups()
+                    .contain(servicePlanResGrp)
+                    ? withGroup.withExistingResourceGroup(servicePlanResGrp)
+                    : withGroup.withNewResourceGroup(servicePlanResGrp);
 
             plan = withPricingTier.withPricingTier(extension.getPricingTier())
                     .withOperatingSystem(os).create();
@@ -143,7 +155,8 @@ public class WebAppUtils {
         final boolean isCustomRegistry = isNotEmpty(containerSettings.getRegistryUrl());
         final boolean isPrivate = isNotEmpty(containerSettings.getServerId());
 
-        Logging.getLogger(WebAppUtils.class).quiet("ServerId: " + containerSettings.getServerId() + " : " + System.getenv("SERVER_ID"));
+        Logging.getLogger(WebAppUtils.class)
+                .quiet("ServerId: " + containerSettings.getServerId() + " : " + System.getenv("SERVER_ID"));
 
         if (isCustomRegistry) {
             return isPrivate ? DockerImageType.PRIVATE_REGISTRY : DockerImageType.UNKNOWN;

@@ -8,8 +8,6 @@ package com.microsoft.azure.gradle.webapp.auth;
 
 import com.microsoft.azure.gradle.webapp.configuration.Authentication;
 
-import java.io.File;
-
 public interface AuthConfiguration {
 
     String getSubscriptionId();

@@ -11,8 +11,6 @@ import com.microsoft.azure.management.appservice.WebApp.Update;
 import org.gradle.api.GradleException;
 import org.gradle.api.Project;
 
-import java.util.Map;
-
 public class SettingsHandlerImpl implements SettingsHandler {
     private Project project;
 
@@ -22,17 +20,9 @@ public class SettingsHandlerImpl implements SettingsHandler {
 
     @Override
     public void processSettings(WithCreate withCreate) throws GradleException {
-//        final Map appSettings = mojo.getAppSettings();
-//        if (appSettings != null && !appSettings.isEmpty()) {
-//            withCreate.withAppSettings(appSettings);
-//        }
     }
 
     @Override
     public void processSettings(Update update) throws GradleException {
-//        final Map appSettings = mojo.getAppSettings();
-//        if (appSettings != null && !appSettings.isEmpty()) {
-//            update.withAppSettings(appSettings);
-//        }
     }
 }

@@ -23,7 +23,7 @@ import java.nio.file.Paths;
 import java.util.Locale;
 
 /**
- * Helper class to authenticate with Azure
+ * Helper class to authenticate with Azure.
  */
 public class AzureAuthHelper {
     public static final String CLIENT_ID = "client";
@@ -42,7 +42,8 @@ public class AzureAuthHelper {
     private static final String CLIENT_ID_NOT_CONFIG = "Client Id of your service principal is not configured.";
     private static final String TENANT_ID_NOT_CONFIG = "Tenant Id of your service principal is not configured.";
     private static final String KEY_NOT_CONFIG = "Key of your service principal is not configured.";
-    private static final String CERTIFICATE_FILE_NOT_CONFIG = "Certificate of your service principal is not configured.";
+    private static final String CERTIFICATE_FILE_NOT_CONFIG =
+            "Certificate of your service principal is not configured.";
     private static final String CERTIFICATE_FILE_READ_FAIL = "Failed to read certificate file: ";
     private static final String AUTH_FILE_NOT_CONFIG = "Authentication file is not configured.";
     private static final String AUTH_FILE_NOT_EXIST = "Authentication file does not exist: ";
@@ -52,11 +53,6 @@ public class AzureAuthHelper {
     protected AuthConfiguration config;
     private Logger logger = Logging.getLogger(AzureAuthHelper.class);
 
-    /**
-     * Constructor
-     *
-     * @param config
-     */
     public AzureAuthHelper(final AuthConfiguration config) {
         if (config == null) {
             throw new NullPointerException();
@@ -71,9 +67,9 @@ public class AzureAuthHelper {
         }
         try {
             final String subscriptionId = config.getSubscriptionId();
-            return StringUtils.isEmpty(subscriptionId) ?
-                    auth.withDefaultSubscription() :
-                    auth.withSubscription(subscriptionId);
+            return StringUtils.isEmpty(subscriptionId)
+                    ? auth.withDefaultSubscription()
+                    : auth.withSubscription(subscriptionId);
         } catch (Exception e) {
             logger.debug("", e);
         }
@@ -81,9 +77,7 @@ public class AzureAuthHelper {
     }
 
     protected LogLevel getLogLevel() {
-        return logger.isDebugEnabled() ?
-                LogLevel.BODY_AND_HEADERS :
-                LogLevel.NONE;
+        return logger.isDebugEnabled() ? LogLevel.BODY_AND_HEADERS : LogLevel.NONE;
     }
 
     protected Azure.Configurable azureConfigure() {
@@ -111,9 +105,10 @@ public class AzureAuthHelper {
 
     protected Authenticated getAuthObj() {
         Authenticated auth;
-        // check if project has Azure authentication settings in build.gradle or gradle.properties or in environment variables
+        // check if project has Azure authentication settings in build.gradle
+        // or gradle.properties or in environment variables
         final Authentication authSetting = config.getAuthenticationSettings();
-        switch ( authSetting.getType() ) {
+        switch (authSetting.getType()) {
             case FILE:
                 if (authSetting.getFile() != null) {
                     return getAuthObjFromFile(new File(authSetting.getFile()));

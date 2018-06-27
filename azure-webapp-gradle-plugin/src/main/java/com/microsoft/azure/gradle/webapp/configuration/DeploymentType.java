@@ -6,11 +6,6 @@
 
 package com.microsoft.azure.gradle.webapp.configuration;
 
-
-import org.apache.commons.lang3.StringUtils;
-
-import java.util.Locale;
-
 public enum DeploymentType {
     NONE,
     FTP,

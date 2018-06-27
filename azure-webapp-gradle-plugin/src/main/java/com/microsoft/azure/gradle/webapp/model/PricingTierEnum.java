@@ -38,6 +38,10 @@ public enum PricingTierEnum {
         this.pricingTier = pricingTier;
     }
 
+    /**
+     * TODO.
+     * @return TODO.
+     */
     public PricingTier toPricingTier() {
         switch (pricingTier) {
             case "F1":

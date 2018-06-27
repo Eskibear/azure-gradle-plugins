@@ -3,8 +3,8 @@
  * Licensed under the MIT License. See License.txt in the project root for
  * license information.
  */
-package com.microsoft.azure.gradle.webapp.configuration;
 
+package com.microsoft.azure.gradle.webapp.configuration;
 
 import com.microsoft.azure.management.appservice.JavaVersion;
 import com.microsoft.azure.management.appservice.WebContainer;

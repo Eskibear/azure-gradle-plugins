@@ -8,8 +8,8 @@ package com.microsoft.azure.gradle.webapp.handlers;
 
 import com.microsoft.azure.gradle.webapp.AzureWebAppExtension;
 import com.microsoft.azure.gradle.webapp.DeployTask;
-import com.microsoft.azure.gradle.webapp.helpers.WebAppUtils;
 import com.microsoft.azure.gradle.webapp.configuration.ContainerSettings;
+import com.microsoft.azure.gradle.webapp.helpers.WebAppUtils;
 import com.microsoft.azure.management.appservice.AppServicePlan;
 import com.microsoft.azure.management.appservice.OperatingSystem;
 import com.microsoft.azure.management.appservice.WebApp;
@@ -19,7 +19,8 @@ import org.gradle.api.GradleException;
 
 public class PrivateRegistryRuntimeHandlerImpl implements RuntimeHandler {
     private static final String SERVER_ID_NOT_FOUND = "Server Id not found in containerSettings.";
-    private static final String CREDENTIALS_NOT_FOUND = "Container registry credentials not found in containerSettings.";
+    private static final String CREDENTIALS_NOT_FOUND =
+            "Container registry credentials not found in containerSettings.";
 
     private DeployTask task;
     private AzureWebAppExtension extension;

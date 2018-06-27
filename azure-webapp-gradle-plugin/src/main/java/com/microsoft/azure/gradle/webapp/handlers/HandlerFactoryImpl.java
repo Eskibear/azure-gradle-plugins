@@ -13,12 +13,13 @@ import org.gradle.api.GradleException;
 import org.gradle.api.Project;
 
 public class HandlerFactoryImpl extends HandlerFactory {
-    private static final String RUNTIME_CONFIG_CONFLICT = "'appServiceOnWindows' is for Web App on Windows; " +
-            "'appServiceOnLinux' is for Web App on Linux; " +
-            "'containerSettings' is for Web App for Containers; only one can be specified at the same time.";
+    private static final String RUNTIME_CONFIG_CONFLICT = "'appServiceOnWindows' is for Web App on Windows; "
+            + "'appServiceOnLinux' is for Web App on Linux; "
+            + "'containerSettings' is for Web App for Containers; only one can be specified at the same time.";
     private static final String IMAGE_NAME_MISSING = "'imageName' not found within 'containerSettings'.";
     public static final String DEPLOYMENT_TYPE_NOT_FOUND = "deployment.type is not configured in build.gradle.";
-    public static final String UNKNOWN_DEPLOYMENT_TYPE = "Unknown value from deployment.type configured in build.gradle.";
+    public static final String UNKNOWN_DEPLOYMENT_TYPE =
+            "Unknown value from deployment.type configured in build.gradle.";
 
     @Override
     public RuntimeHandler getRuntimeHandler(final DeployTask task) throws GradleException {
@@ -27,13 +28,14 @@ public class HandlerFactoryImpl extends HandlerFactory {
         AppServiceOnLinux appServiceOnLinux = task.getAzureWebAppExtension().getAppServiceOnLinux();
         final ContainerSettings containerSettings = task.getAzureWebAppExtension().getContainerSettings();
         // No configuration is specified
-        if (appServiceOnLinux == null && appServiceOnWindows == null && containerSettings == null ) {
+        if (appServiceOnLinux == null && appServiceOnWindows == null && containerSettings == null) {
             return new NullRuntimeHandlerImpl();
         }
 
         // More than one configuration specified
-        if ((appServiceOnLinux != null && containerSettings != null) || (containerSettings != null && appServiceOnWindows != null) ||
-                (appServiceOnLinux != null && appServiceOnWindows != null))  {
+        if ((appServiceOnLinux != null && containerSettings != null)
+                || (containerSettings != null && appServiceOnWindows != null)
+                || (appServiceOnLinux != null && appServiceOnWindows != null)) {
             throw new GradleException(RUNTIME_CONFIG_CONFLICT);
         }
 
@@ -56,9 +58,9 @@ public class HandlerFactoryImpl extends HandlerFactory {
                 return new PrivateRegistryRuntimeHandlerImpl(task);
             case NONE:
                 throw new GradleException(IMAGE_NAME_MISSING);
+            default:
+                throw new GradleException(NullRuntimeHandlerImpl.NO_RUNTIME_CONFIG);
         }
-
-        throw new GradleException(NullRuntimeHandlerImpl.NO_RUNTIME_CONFIG);
     }
 
     @Override

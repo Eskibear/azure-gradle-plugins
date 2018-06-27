@@ -13,7 +13,7 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class ContainerSettings {
     /**
-     * Docker image name
+     * Docker image name.
      */
     private String imageName;
 
@@ -61,9 +61,9 @@ public class ContainerSettings {
     }
 
     public boolean isEmpty() {
-        return StringUtils.isEmpty(getImageName()) &&
-                StringUtils.isEmpty(getStartUpFile()) &&
-                StringUtils.isEmpty(getServerId()) &&
-                StringUtils.isEmpty(getRegistryUrl());
+        return StringUtils.isEmpty(getImageName())
+                && StringUtils.isEmpty(getStartUpFile())
+                && StringUtils.isEmpty(getServerId())
+                && StringUtils.isEmpty(getRegistryUrl());
     }
 }

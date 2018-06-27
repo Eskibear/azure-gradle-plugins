@@ -3,6 +3,7 @@
  * Licensed under the MIT License. See License.txt in the project root for
  * license information.
  */
+
 package com.microsoft.azure.gradle.webapp;
 
 import com.microsoft.azure.gradle.webapp.auth.AuthConfiguration;
@@ -17,7 +18,6 @@ import org.gradle.api.DefaultTask;
 import org.gradle.api.tasks.TaskAction;
 import org.gradle.api.tasks.TaskExecutionException;
 
-import java.io.File;
 import java.lang.reflect.Field;
 import java.util.Map;
 
@@ -76,7 +76,8 @@ public class DeployTask extends DefaultTask implements AuthConfiguration {
 
     public WebApp getWebApp() throws AzureAuthFailureException {
         try {
-            return getAzureClient().webApps().getByResourceGroup(azureWebAppExtension.getResourceGroup(), azureWebAppExtension.getAppName());
+            return getAzureClient().webApps()
+                    .getByResourceGroup(azureWebAppExtension.getResourceGroup(), azureWebAppExtension.getAppName());
         } catch (AzureAuthFailureException authEx) {
             throw authEx;
         } catch (Exception ex) {
@@ -126,11 +127,7 @@ public class DeployTask extends DefaultTask implements AuthConfiguration {
         if (azure == null) {
             azure = azureAuthHelper.getAzureClient();
             if (azure == null) {
-//                getTelemetryProxy().trackEvent(INIT_FAILURE);
                 throw new AzureAuthFailureException(AZURE_INIT_FAIL);
-            } else {
-                // Repopulate subscriptionId in case it is not configured.
-//                getTelemetryProxy().addDefaultProperty(SUBSCRIPTION_ID_KEY, azure.subscriptionId());
             }
         }
         return azure;
@@ -150,18 +147,14 @@ public class DeployTask extends DefaultTask implements AuthConfiguration {
     @Override
     public String getUserAgent() {
         return getName() + " " + getGroup();
-//        return String.format("%s/%s %s:%s %s:%s", this.getName(), this.getGroup()
-//                getPluginName(), getPluginVersion(),
-//                INSTALLATION_ID_KEY, getInstallationId(),
-//                SESSION_ID_KEY, getSessionId());
     }
 
     @Override
     public Authentication getAuthenticationSettings() {
         Authentication authSetting = azureWebAppExtension.getAuthentication();
         Map<String, ?> props = getProject().getProperties();
-        for ( Field f : authSetting.getClass().getDeclaredFields()){
-            try{
+        for (Field f : authSetting.getClass().getDeclaredFields()) {
+            try {
                 String key = String.format("com.microsoft.azure.auth.%s", f.getName());
                 if (null == f.get(authSetting) && props.containsKey(key)) {
                     f.set(authSetting, props.get(key));
