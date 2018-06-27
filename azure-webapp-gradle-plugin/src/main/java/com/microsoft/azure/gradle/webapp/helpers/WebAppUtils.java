@@ -100,14 +100,6 @@ public class WebAppUtils {
         }
     }
 
-    /**
-     * createOrGetAppServicePlan.
-     *
-     * @param task TODO.
-     * @param os   TODO.
-     * @return TODO.
-     * @throws Exception TODO.
-     */
     public static AppServicePlan createOrGetAppServicePlan(DeployTask task, OperatingSystem os)
             throws Exception {
         AzureWebAppExtension extension = task.getAzureWebAppExtension();

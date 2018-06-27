@@ -40,14 +40,6 @@ public class FTPUploader {
 
     /**
      * Upload directory to specified FTP server with retries.
-     *
-     * @param ftpServer       TODO.
-     * @param username        TODO.
-     * @param password        TODO.
-     * @param sourceDirectory TODO.
-     * @param targetDirectory TODO.
-     * @param maxRetryCount   TODO.
-     * @throws GradleException TODO.
      */
     public void uploadDirectoryWithRetries(final String ftpServer, final String username, final String password,
                                            final String sourceDirectory, final String targetDirectory,
@@ -70,11 +62,6 @@ public class FTPUploader {
     /**
      * Upload directory to specified FTP server without retries.
      *
-     * @param ftpServer           TODO.
-     * @param username            TODO.
-     * @param password            TODO.
-     * @param sourceDirectoryPath TODO.
-     * @param targetDirectoryPath TODO.
      * @return Boolean to indicate whether uploading is successful.
      */
     protected boolean uploadDirectory(final String ftpServer, final String username, final String password,
@@ -98,11 +85,6 @@ public class FTPUploader {
 
     /**
      * Recursively upload a directory to FTP server with the provided FTP client object.
-     *
-     * @param sourceDirectoryPath TODO.
-     * @param targetDirectoryPath TODO.
-     * @param logPrefix           TODO.
-     * @throws IOException TODO.
      */
     protected void uploadDirectory(final FTPClient ftpClient, final String sourceDirectoryPath,
                                    final String targetDirectoryPath, final String logPrefix) throws IOException {
@@ -133,11 +115,6 @@ public class FTPUploader {
 
     /**
      * Upload a single file to FTP server with the provided FTP client object.
-     *
-     * @param sourceFilePath TODO.
-     * @param targetFilePath TODO.
-     * @param logPrefix      TODO.
-     * @throws IOException TODO.
      */
     protected void uploadFile(final FTPClient ftpClient, final String sourceFilePath, final String targetFilePath,
                               final String logPrefix) throws IOException {
