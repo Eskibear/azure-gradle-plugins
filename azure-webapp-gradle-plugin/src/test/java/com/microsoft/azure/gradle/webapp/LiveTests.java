@@ -3,9 +3,9 @@
  * Licensed under the MIT License. See License.txt in the project root for
  * license information.
  */
+
 package com.microsoft.azure.gradle.webapp;
 
-import org.gradle.api.tasks.Input;
 import org.gradle.testkit.runner.BuildResult;
 import org.gradle.testkit.runner.GradleRunner;
 import org.junit.After;
@@ -21,8 +21,8 @@ import static org.gradle.testkit.runner.TaskOutcome.SUCCESS;
 import static org.junit.Assert.assertEquals;
 
 public class LiveTests {
-    @Rule public final TemporaryFolder testProjectDir = new TemporaryFolder();
-//    File projectDir = new File(".\\testProjects\\simpleProject");
+    @Rule
+    public final TemporaryFolder testProjectDir = new TemporaryFolder();
     private File projectDir = new File(".\\testProjects\\dockerProject");
 
     @Ignore
