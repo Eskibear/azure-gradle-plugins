@@ -26,8 +26,21 @@ azurewebapp {
         file = "<path of auth file>"
     }
     deployment = {
-        type = "war"
-        warFile = "${projectDir}/../webProject.war"
-        contextPath = 'authbyfile'
+        type = 'ftp'
+        resources = [
+                {
+                    sourcePath = "${projectDir}/../webProject.war".toString()
+                    // Optional, relative path to /site/wwwroot
+                    targetPath = "FoldeA"
+                },
+                {
+                    sourcePath = "${projectDir}/resources".toString()
+                    targetPath = "FolderB"
+                },
+                {
+                    sourcePath = "${projectDir}/../webProject.war".toString()
+                    // targetPath is not defined, will upload to /site/wwwroot/
+                }
+        ]
     }
 }

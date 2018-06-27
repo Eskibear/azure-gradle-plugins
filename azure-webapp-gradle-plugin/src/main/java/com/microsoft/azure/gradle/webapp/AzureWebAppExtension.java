@@ -10,9 +10,6 @@ import com.microsoft.azure.gradle.webapp.model.PricingTierEnum;
 import com.microsoft.azure.management.appservice.PricingTier;
 import groovy.lang.Closure;
 import org.gradle.api.Project;
-import org.gradle.api.tasks.Input;
-
-import java.io.File;
 
 public class AzureWebAppExtension {
     public static final String WEBAPP_EXTENSION_NAME = "azurewebapp";
@@ -24,13 +21,12 @@ public class AzureWebAppExtension {
     private String appServicePlanResourceGroup;
     private String appServicePlanName;
     private PricingTierEnum pricingTier;
-    private String target;
     private boolean stopAppDuringDeployment;
-    private DeploymentType deploymentType = DeploymentType.WAR;
     private AppServiceOnLinux appServiceOnLinux;
     private AppServiceOnWindows appServiceOnWindows;
     private ContainerSettings containerSettings;
     private Authentication authentication;
+    private Deployment deployment;
 
     public AzureWebAppExtension(Project project) {
         this.project = project;
@@ -79,16 +75,8 @@ public class AzureWebAppExtension {
         return pricingTier == null ? PricingTier.STANDARD_S1 : pricingTier.toPricingTier();
     }
 
-    public String getTarget() {
-        return target;
-    }
-
     public boolean isStopAppDuringDeployment() {
         return stopAppDuringDeployment;
-    }
-
-    public DeploymentType getDeploymentType() {
-        return deploymentType;
     }
 
     public String getAppServicePlanResourceGroup() {
@@ -110,5 +98,14 @@ public class AzureWebAppExtension {
     public void setAuthentication(Closure closure) {
         authentication = new Authentication();
         project.configure(authentication, closure);
+    }
+
+    public Deployment getDeployment() {
+        return deployment;
+    }
+
+    public void setDeployment(Closure closure) {
+        deployment = new Deployment();
+        project.configure(deployment, closure);
     }
 }

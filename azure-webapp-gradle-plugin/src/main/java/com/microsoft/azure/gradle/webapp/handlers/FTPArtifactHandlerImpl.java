@@ -8,6 +8,8 @@ package com.microsoft.azure.gradle.webapp.handlers;
 
 import com.microsoft.azure.gradle.webapp.AzureWebAppExtension;
 import com.microsoft.azure.gradle.webapp.DeployTask;
+import com.microsoft.azure.gradle.webapp.configuration.Deployment;
+import com.microsoft.azure.gradle.webapp.configuration.FTPResource;
 import com.microsoft.azure.gradle.webapp.helpers.FTPUploader;
 import com.microsoft.azure.management.appservice.PublishingProfile;
 import com.microsoft.azure.management.appservice.WebApp;
@@ -19,12 +21,14 @@ import org.gradle.api.logging.Logging;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.List;
 
 import static com.microsoft.azure.gradle.webapp.AzureWebAppExtension.WEBAPP_EXTENSION_NAME;
 
 public class FTPArtifactHandlerImpl implements ArtifactHandler {
-    private static final String DEFAULT_WEBAPP_ROOT = "/site/wwwroot" + "/webapps";
+    private static final String DEFAULT_WEBAPP_ROOT = "/site/wwwroot";
     private static final int DEFAULT_MAX_RETRY_TIMES = 3;
+    private static final String RESOURCES_NOT_SPECIFIED = "The deployment.resources is not configured in build.gradle.";
 
     private Project project;
     private AzureWebAppExtension azureWebAppExtension;
@@ -37,33 +41,40 @@ public class FTPArtifactHandlerImpl implements ArtifactHandler {
 
     @Override
     public void publish() throws Exception {
-        copyResourceToStageDirectory();
-        uploadDirectoryToFTP();
-    }
-
-    private void copyResourceToStageDirectory() throws IOException {
-        String target = azureWebAppExtension.getTarget();
-        if (target == null || target.isEmpty()) {
-            target = project.getTasks().getByPath("war").getOutputs().getFiles().getAsPath();
+        Deployment deployment = azureWebAppExtension.getDeployment();
+        if (copyResourceToStageDirectory(deployment.getResources())) {
+            uploadDirectoryToFTP();
         }
-        logger.quiet("War name is: " + target);
-//        Files.copy(Paths.get(target), Paths.get(task.getDeploymentStageDirectory()));
-        FileUtils.copyFileToDirectory(new File(target), new File(getDeploymentStageDirectory()));
-//        Utils.copyResources(/*mojo.getProject()*/null,
-//                task.getSession(),
-//                mojo.getMavenResourcesFiltering(),
-//                resources,
-//                mojo.getDeploymentStageDirectory());
     }
 
-//    protected void copyResourcesToStageDirectory(final List<Resource> resources) throws IOException {
+    private boolean copyResourceToStageDirectory(final List<FTPResource> resources) {
+        if (resources == null || resources.isEmpty()) {
+            logger.quiet(RESOURCES_NOT_SPECIFIED);
+            return false;
+        }
+        resources.forEach(item -> {
+            doCopyResourceToStageDirectory(item);
+        });
+        return true;
+    }
 
-//        Utils.copyResources(/*mojo.getProject()*/null,
-//                task.getSession(),
-//                mojo.getMavenResourcesFiltering(),
-//                resources,
-//                mojo.getDeploymentStageDirectory());
-//    }
+    private void doCopyResourceToStageDirectory(final FTPResource resource) {
+        File file  = new File(resource.getSourcePath());
+        if (!file.exists()) {
+            logger.quiet(resource.getSourcePath() + " configured in deployment.resources does not exist.");
+            return;
+        }
+        File destination = new File(Paths.get(getDeploymentStageDirectory(), resource.getTargetPath()).toString());
+        try {
+            if (file.isFile()) {
+                FileUtils.copyFileToDirectory(file, destination);
+            } else if (file.isDirectory()) {
+                FileUtils.copyDirectoryToDirectory(file, destination);
+            }
+        } catch (IOException e) {
+            logger.quiet("exception when copy resource: " + e.getLocalizedMessage());
+        }
+    }
 
     private void uploadDirectoryToFTP() throws Exception {
         final FTPUploader uploader = getUploader();
@@ -80,10 +91,6 @@ public class FTPArtifactHandlerImpl implements ArtifactHandler {
 
     private FTPUploader getUploader() {
         return new FTPUploader(logger);
-    }
-
-    private void copyResource() {
-
     }
 
     private String getDeploymentStageDirectory() {

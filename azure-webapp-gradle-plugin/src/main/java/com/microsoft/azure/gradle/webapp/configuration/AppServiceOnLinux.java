@@ -10,13 +10,8 @@ public class AppServiceOnLinux {
      * Docker image name
      */
     private String runtimeStack;
-    private String urlPath;
 
     public String getRuntimeStack() {
         return runtimeStack;
-    }
-
-    public String getUrlPath() {
-        return urlPath;
     }
 }

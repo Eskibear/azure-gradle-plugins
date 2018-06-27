@@ -7,6 +7,7 @@ package com.microsoft.azure.gradle.webapp.handlers;
 
 import com.google.common.io.Files;
 import com.microsoft.azure.gradle.webapp.DeployTask;
+import com.microsoft.azure.gradle.webapp.configuration.Deployment;
 import org.gradle.api.GradleException;
 
 import java.io.File;
@@ -25,30 +26,26 @@ public class WarDeployHandlerImpl implements ArtifactHandler {
 
     @Override
     public void publish() throws GradleException {
-        String target = task.getAzureWebAppExtension().getTarget();
-        if (target == null || target.isEmpty()) {
-            target = task.getProject().getTasks().getByPath("war").getOutputs().getFiles().getAsPath();
+        Deployment deployment = task.getAzureWebAppExtension().getDeployment();
+        String warFile = deployment.getWarFile();
+        if (warFile == null || warFile.isEmpty()) {
+            warFile = task.getProject().getTasks().getByPath("war").getOutputs().getFiles().getAsPath();
         }
 
-        File targetFile = new File(target);
+        File targetFile = new File(warFile);
         assureWarFileExisted(targetFile);
 
-        String urlPath;
-        if (task.getAzureWebAppExtension().getAppServiceOnLinux() != null) {
-            urlPath = task.getAzureWebAppExtension().getAppServiceOnLinux().getUrlPath();
-        } else if (task.getAzureWebAppExtension().getAppServiceOnWindows() != null) {
-            urlPath = task.getAzureWebAppExtension().getAppServiceOnWindows().getUrlPath();
-        } else {
-            throw new GradleException("WARDEPLOY deployment type not available for Web Apps on Containers deployments");
+        if (task.getAzureWebAppExtension().getAppServiceOnLinux() == null &&
+                task.getAzureWebAppExtension().getAppServiceOnWindows() == null) {
+            throw new GradleException("WAR deployment type not available for Web Apps on Containers deployments");
         }
-//        task.getWebApp().update().withAppSetting("SCM_TARGET_PATH", "webapps/" + (urlPath == null ? "" : urlPath)).apply();
-        task.getLogger().quiet("War name is: " + target);
-        urlPath = urlPath == null ? "" : urlPath;
+        String contextPath = task.getAzureWebAppExtension().getDeployment().getContextPath();
+        task.getLogger().quiet("War name is: " + warFile);
         int retryCount = 0;
         task.getLogger().quiet("Starting to deploy the war file...");
         while (retryCount++ < DEFAULT_MAX_RETRY_TIMES) {
             try {
-                task.getWebApp().warDeploy(targetFile, urlPath);
+                task.getWebApp().warDeploy(targetFile, contextPath);
                 return;
             } catch (Exception e) {
                 task.getLogger().quiet(String.format(UPLOAD_FAILURE, retryCount, DEFAULT_MAX_RETRY_TIMES));

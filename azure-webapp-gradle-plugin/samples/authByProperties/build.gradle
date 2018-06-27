@@ -13,18 +13,20 @@ buildscript {
 apply plugin: 'com.microsoft.azure.azurewebapp'
 
 azurewebapp {
-    deploymentType = 'war'
     resourceGroup = 'resourceGroup'
     appName = 'appname'
     pricingTier = 'S1'
     region = 'southcentralus'
-    target = "${projectDir}/../webProject.war"
     appServiceOnWindows = {
         javaWebContainer = "tomcat 8.5"
         javaVersion = "1.8.0_102"
-        urlPath = 'authbyproperties'
     }
     authentication = {
         type = "properties"
+    }
+    deployment = {
+        type = "war"
+        warFile = "${projectDir}/../webProject.war"
+        contextPath = 'authbyproperties'
     }
 }

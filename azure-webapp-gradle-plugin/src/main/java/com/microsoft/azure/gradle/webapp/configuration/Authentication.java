@@ -1,14 +1,14 @@
 package com.microsoft.azure.gradle.webapp.configuration;
 
 public class Authentication {
-    private AuthenticationType type;
-    private String file;
-    private String client;
-    private String tenant;
-    private String key;
-    private String certificate;
-    private String certificatePassword;
-    private String environment = "AZURE";
+    public AuthenticationType type;
+    public String file;
+    public String client;
+    public String tenant;
+    public String key;
+    public String certificate;
+    public String certificatePassword;
+    public String environment = "AZURE";
 
 
     public String getFile() {

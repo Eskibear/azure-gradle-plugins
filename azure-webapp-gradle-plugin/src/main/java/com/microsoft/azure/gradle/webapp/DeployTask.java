@@ -109,11 +109,6 @@ public class DeployTask extends DefaultTask implements AuthConfiguration {
     }
 
     private void deployArtifacts() throws Exception {
-        //getResources();
-        /*if (resources == null || resources.isEmpty()) {
-            getLog().info(NO_RESOURCES_CONFIG);
-        } else */
-        // Deployment to container services, nothing to upload
         if (azureWebAppExtension.getContainerSettings() != null) {
             getLogger().quiet("Deployment completed");
         } else {

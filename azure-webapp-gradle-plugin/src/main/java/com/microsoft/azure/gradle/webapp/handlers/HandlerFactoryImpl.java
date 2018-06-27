@@ -7,12 +7,8 @@
 package com.microsoft.azure.gradle.webapp.handlers;
 
 import com.microsoft.azure.gradle.webapp.DeployTask;
-import com.microsoft.azure.gradle.webapp.configuration.AppServiceOnLinux;
-import com.microsoft.azure.gradle.webapp.configuration.AppServiceOnWindows;
-import com.microsoft.azure.gradle.webapp.configuration.DeploymentType;
+import com.microsoft.azure.gradle.webapp.configuration.*;
 import com.microsoft.azure.gradle.webapp.helpers.WebAppUtils;
-import com.microsoft.azure.gradle.webapp.configuration.ContainerSettings;
-import com.microsoft.azure.gradle.webapp.configuration.DockerImageType;
 import org.gradle.api.GradleException;
 import org.gradle.api.Project;
 
@@ -21,6 +17,8 @@ public class HandlerFactoryImpl extends HandlerFactory {
             "'appServiceOnLinux' is for Web App on Linux; " +
             "'containerSettings' is for Web App for Containers; only one can be specified at the same time.";
     private static final String IMAGE_NAME_MISSING = "'imageName' not found within 'containerSettings'.";
+    public static final String DEPLOYMENT_TYPE_NOT_FOUND = "deployment.type is not configured in build.gradle.";
+    public static final String UNKNOWN_DEPLOYMENT_TYPE = "Unknown value from deployment.type configured in build.gradle.";
 
     @Override
     public RuntimeHandler getRuntimeHandler(final DeployTask task) throws GradleException {
@@ -70,13 +68,17 @@ public class HandlerFactoryImpl extends HandlerFactory {
 
     @Override
     public ArtifactHandler getArtifactHandler(final DeployTask task) throws GradleException {
-        if (DeploymentType.WAR.equals(task.getAzureWebAppExtension().getDeploymentType())) {
-            return new WarDeployHandlerImpl(task);
+        Deployment deployment = task.getAzureWebAppExtension().getDeployment();
+        switch (deployment.getType()) {
+            case NONE:
+                throw new GradleException(DEPLOYMENT_TYPE_NOT_FOUND);
+            case UNKNOWN:
+                throw new GradleException(UNKNOWN_DEPLOYMENT_TYPE);
+            case WAR:
+                return new WarDeployHandlerImpl(task);
+            case FTP:
+            default:
+                return new FTPArtifactHandlerImpl(task.getProject());
         }
-//        if (task.getAzureWebAppExtension().getPackageUri() != null) {
-//            return new WebDeployHandlerImpl(task);
-//        } else {
-            return new FTPArtifactHandlerImpl(task.getProject());
-//        }
     }
 }
